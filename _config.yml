@@ -1,8 +1,8 @@
 # Site settings 
 title: John Mark Agosta's musings
-email: johnmark.agosta@gmail.com
+email: musings at agosta dot org
 description: > # this means to ignore newlines until "baseurl:"
-    Occasional notes on current readings, theory, language & (gasp) culture
+    Occasional notes on current readings, theory, language & (gasp) culture.
 baseurl: "" # the subpath of your site, e.g. /blog/
 url: "http://johnmarkagosta.com" # the base hostname & protocol for your site
 twitter_username: quantifiedcar
