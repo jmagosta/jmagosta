@@ -89,7 +89,17 @@ Then all that's needed is to commit and push the site contents to the new remote
 
 ## The edit, run, deploy cycle
 
-Since *Jekyll* serves locally, and also identically on the *GItHub* server, you can see you changes locally simply by keeping the local server running as you edit markdown files in your repository.  Edits will appear as you refresh your browser pointing to ```localhost:4000```
+Since *Jekyll* serves locally, and also identically on the *GItHub* server, you can see you changes locally simply by keeping the local server running as you edit markdown files in your repository. Start a local server in the root directory by running
+
+> $ jekyll serve
+
+The command responds with the location of `_config.yml` and the `_site` directory where results go.   It ends with instruction on how to view your work:
+
+>    Server address: http://127.0.0.1:4000/  
+>  Server running... press ctrl-c to stop.
+
+
+Edits will appear as you refresh your browser pointing to ```localhost:4000```
 
 Then when you want to deploy your changes, just push the repository commits to *GitHub*, so *GitHub* will see them.  That's all need be done to make the changes go ''live."
 
