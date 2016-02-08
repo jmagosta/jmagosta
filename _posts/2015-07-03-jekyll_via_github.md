@@ -6,7 +6,7 @@ layout: post
 # Setting up static websites hosted by *Github*, with *Jekyll*
 
 Yes that's a mouth-full, but it describes the shortest path to setting up a blog for the modestly code-savvy blogger.
-[Jekyll](http://http://jekyllrb.com/docs) is the simplest of all content management systems for building a website.
+[Jekyll](http://jekyllrb.com/docs) is the simplest of all content management systems for building a website.
 Github, if you are familiar with it as a code-sharing repository, incidentally also serves webpages. Think of
 the ```README.md``` file that *GitHub* shows for each respository. So as a sideline, they've created a way for one to serve a directory with collections of pages residing in a repository.
 
