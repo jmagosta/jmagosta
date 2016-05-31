@@ -2,7 +2,7 @@
 title: Agosta's Blog ⇋ Mixing Memory and Desire
 email: musings at agosta dot org
 description: > # this means to ignore newlines until "baseurl:"
-    Occasional notes on current readings, theory, language & (gasp) culture.
+    Occasional notes on current readings, theory, language & culture.
 baseurl: "" # the subpath of your site, e.g. /blog/
 url: "http://blog.johnmarkagosta.com" # the base hostname & protocol for your site
 twitter_username: quantifiedcar
