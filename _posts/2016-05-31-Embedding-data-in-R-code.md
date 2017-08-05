@@ -1,3 +1,7 @@
+---
+title: Embedding Data Directly in R-Code
+layout: post
+---
 # Direct input of data frames
 
 A little known feature of `read.table()` is the ability to incorporate data as text directly in code. Of course one can create vectors
@@ -25,7 +29,7 @@ Felicitously the `sep=''` default correctly identifies any whitespace as a field
 matches the embedded line endings.  Consequently there's no need to modify the text; copy and paste into the code just works.
 It couldn't be any easier.
 
-## textConnection can be used anywhere a file is needed.
+# So `textConnection` can be used anywhere a file is needed.
 
 Under the hood the text argument is just syntactic sugar for first creating a `textConnection`, which can be used in place of a file:
 
