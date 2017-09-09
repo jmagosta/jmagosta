@@ -1,0 +1,54 @@
+---
+title: "wilkinson"
+author: "JMA"
+date: "September 1, 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## An exmple of numerical instability with Wilkinson's polynomial
+
+Evaluate the Wilkinson polynomial by term by term construction -
+$w_n(x) = \prod_{k=1\ldots n}(x-k)$
+This avoids integer rounding errors -  a smoother version
+
+```{r wilkinson.products}
+
+wilkinson.products <- function(x, nn=20) {
+    w <- function(x, n=nn) {
+        v <- rep(x, n) - seq(n)  # The terms in the polynomial product (x-1), (x-2), ...
+        Reduce( '*', v)
+    }
+sapply(x, w)
+}
+```
+
+Expanding the polynomial, one finds
+Note this suffers from a few percent noise due to integer overflow
+```{r wilkinson.20}
+wilkinson.20 <- function(x) {
+    y <- x^20 - 210L * x^19 + 20615L * x^18 - 1256850L * x^17 + 53327946L * x^16 -
+    1672280820L * x^15 +40171771630L * x^14 - 756111184500L * x^13 +
+    11310276995381L * x^12 - 135585182899530L * x^11 +
+    1307535010540395L * x^10 - 10142299865511450L * x^9 +
+    63030812099294896L * x^8 - 311333643161390640L * x^7 +
+    1206647803780373360L * x^6 - 3599979517947607200L * x^5 +
+    8037811822645051776L * x^4 - 12870931245150988800L * x^3 +
+    13803759753640704000L * x^2 - 8752948036761600000L * x +
+    2432902008176640000L
+    y
+}
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
