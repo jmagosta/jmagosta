@@ -8,7 +8,7 @@
 #  .Machine$double.eps
 #  .Machine$integer.max  = 2^31 - 1
 library(jsonlite)
-# library(devtools)
+
 if (!("RProtoBuf"  %in% .packages(all=TRUE)) ) {
     install.packages("RProtoBuf")
 }
@@ -140,7 +140,7 @@ wilkinson.errs.pb <- function(the.range= 1:10, poly.degree=17) {
 }
 
 
-# plot the errors in errors in the "round trip" evaluation for json and protocol buffers. 
+# plot the errors in errors in the "round trip" evaluation for json and protocol buffers.
 the.json.errs <- wilkinson.errs.json(1:20, 20)
 plot(the.json.errs[[1]], the.json.errs[[2]], type='b', col='red', main='Round Trip Evaluation Errors')
 the.pb.errs <- wilkinson.errs.pb(1:20, 20)

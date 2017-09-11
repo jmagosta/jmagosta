@@ -11,6 +11,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## An exmple of numerical instability with Wilkinson's polynomial
 
+
 Evaluate the Wilkinson polynomial by term by term construction -
 $w_n(x) = \prod_{k=1\ldots n}(x-k)$
 This avoids integer rounding errors -  a smoother version
@@ -43,12 +44,40 @@ wilkinson.20 <- function(x) {
 }
 ```
 
-## Including Plots
+Google's _Protocol Buffers_ convert language-specific data structures to a universal binary transfer format. It has interfaces in several languages, but not `R`. Fortunately `RProtoBuf` wraps _Protocol Buffers_, and goes a step further, to generate protocol payload conversion descriptions (as contained in `.proto` file) dynamically, hiding the machinery needed with other languages. 
 
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
+```{r}
+if (!("RProtoBuf"  %in% .packages(all=TRUE)) ) {
+    install.packages("RProtoBuf")
+}
+library(RProtoBuf)
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+On the Mac, for example, you may instead get an error during install:
+
+>   checking google/protobuf/stubs/common.h usability... no
+>   checking google/protobuf/stubs/common.h presence... no
+>   checking for google/protobuf/stubs/common.h... no
+>   configure: WARNING: Protobuf headers not found with default CXXFLAGS and CPPFLAGS, manually trying /usr/local/include
+
+The `RProtobuf` install requires your machine already has Google's _Protocol Buffers_ installed. To find out if it's there already, see if the compiler `protoc` runs at the command line:
+```{bash}
+protoc --version
+```
+If instead the command isn't recognized, you need to install [_Protocol Buffers_](https://developers.google.com/protocol-buffers/) from [its github repository](https://github.com/google/protobuf.git). Be forewarned that you may discover that this takes more than just a few steps since it requires an extensive toolchain. _Do you know the story [If you give a Mouse a Cookie?]()._
+
+Note: On the Mac you will need to have installed the _command line tools_ that come with Apple's _XCode_ development environment. You will also need the following:  `pkg-config`, which autoconf
+autoconf
+libtool
+automake
+glibtool (a replacement for Mac's native libtool)
+
+/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+brew install bazel
+  
+and [`bazel`]()
+which can be installed with Mac package manager `brew` (available at ??)
+Look at the `README.md` files in the root and `src` directories in the `protoBuf` repository for details. 
+
+
+
