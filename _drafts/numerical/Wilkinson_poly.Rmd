@@ -14,9 +14,9 @@ knitr::opts_chunk$set(echo = TRUE)
 With Halloween just around the corner, it's the season to raise the 
 the horrors that occur when the
 
-
-Evaluate the Wilkinson polynomial by term by term construction -
+Wilkinson polynomial has integer roots from 1 to $n$. Evaluate the polynomial by term by term construction
 $w_n(x) = \prod_{k=1\ldots n}(x-k)$
+
 This avoids integer rounding errors -  a smoother version
 
 ```{r wilkinson.products}
@@ -31,7 +31,7 @@ sapply(x, w)
 ```
 
 Expanding the polynomial, one finds
-Note this suffers from a few percent noise due to integer overflow
+
 ```{r wilkinson.20}
 wilkinson.20 <- function(x) {
     y <- x^20 - 210L * x^19 + 20615L * x^18 - 1256850L * x^17 + 53327946L * x^16 -
@@ -46,8 +46,19 @@ wilkinson.20 <- function(x) {
     y
 }
 ```
+Note that just evaluating it in this form suffers from a few percent noise due to integer overflow.
 
-Google's _Protocol Buffers_ convert language-specific data structures to a universal binary transfer format. It comes with interfaces in several languages, but not `R`. Fortunately on CRAN there is a package `RProtoBuf` wraps _Protocol Buffers_, and goes a step further, to generate protocol payload conversion descriptions dynamically (that take the place of writing a `.proto` definition file), hiding some of the machinery needed with other languages. 
+(Insert W. examples)
+
+##### Transfering binary payloads, a better way to travel
+
+Google's _Protocol Buffers_ convert language-specific data structures
+to a universal binary transfer format. It has interfaces in several
+languages, but not `R`. Fortunately on CRAN there is a package
+`RProtoBuf` that wraps _Protocol Buffers_, and goes a step further, to
+generate protocol payload conversion descriptions dynamically (that
+take the place of writing a `.proto` definition file), hiding some of
+the machinery needed with other languages.
 
 ```{r}
 if (!("RProtoBuf"  %in% .packages(all=TRUE)) ) {
@@ -56,31 +67,50 @@ if (!("RProtoBuf"  %in% .packages(all=TRUE)) ) {
 library(RProtoBuf)
 ```
 
-On the Mac, for example, you may instead get an error during install:
+On the Mac you may instead get an error during install:
 
->   checking google/protobuf/stubs/common.h usability... no
->   checking google/protobuf/stubs/common.h presence... no
->   checking for google/protobuf/stubs/common.h... no
->   configure: WARNING: Protobuf headers not found with default CXXFLAGS and CPPFLAGS, manually trying /usr/local/include
+```
+   checking google/protobuf/stubs/common.h usability... no
+   checking google/protobuf/stubs/common.h presence... no
+   checking for google/protobuf/stubs/common.h... no
+   configure: WARNING: Protobuf headers not found with default CXXFLAGS and CPPFLAGS, manually trying /usr/local/include
+```
 
-The `RProtobuf` install requires your machine already has Google's _Protocol Buffers_ installed. To find out if it's there already, see if the compiler `protoc` runs at the command line:
+This fails when `pkg-config` doesn't find include files that are
+missing. This is because the `RProtobuf` install requires your machine
+already to have Google's _Protocol Buffers_ installed from which it
+gets these files. To find out if they are there already, see if the
+compiler `protoc` runs at the command line. If it works you should get
+something like this:
+
 ```{bash}
 protoc --version
 ```
-If instead the command isn't recognized, you need to install [_Protocol Buffers_](https://developers.google.com/protocol-buffers/) from [its github repository](https://github.com/google/protobuf.git). Be forewarned that you may discover that this takes more than just a few steps since it requires an extensive toolchain. _Do you know the story [If you give a Mouse a Cookie?]()._
 
-Note: On the Mac you will need to have installed the _command line tools_ that come with Apple's _XCode_ development environment. You will also need the following:  `pkg-config`, which autoconf
-autoconf
-libtool
-automake
-glibtool (a replacement for Mac's native libtool)
+If instead the command isn't recognized, you need to install the `c++`
+version of [_Protocol
+Buffers_](https://developers.google.com/protocol-buffers/) from [its
+github repository](https://github.com/google/protobuf.git). Be
+forewarned that you may discover that this takes more than just a few
+steps since it requires an extensive toolchain. Follow the `README.md`
+file in the `src` directory, which has you run the `./autogen.sh` file
+in the root directory, then run `./configure`.
 
-/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-brew install bazel
-  
-and [`bazel`]()
-which can be installed with Mac package manager `brew` (available at ??)
-Look at the `README.md` files in the root and `src` directories in the `protoBuf` repository for details. 
+Note: On the Mac you will need several binaries that come installed
+with the _command line tools_, which come with Apple's _XCode_
+development environment. Moreover, the configure command requires
+`bazel`, which you can install with `brew`, the Mac package install
+tool, which you can get from
 
+>   /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
 
+Of course for this you need `ruby` installed. Then you can 
 
+>   brew install bazel
+
+and any other missing build tools, including glibtool (a replacement
+for Mac's native libtool).  Don't worry eventually you'll get
+everything needed.  Does this remind you of the story _[If you give a
+Mouse a Cookie?](https://en.wikipedia.org/wiki/If_You_Give_a_Mouse_a_Cookie)_
+You get the picture. :)
+ 
