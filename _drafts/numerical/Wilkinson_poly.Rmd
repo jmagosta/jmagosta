@@ -1,5 +1,5 @@
 ---
-title: "wilkinson"
+title: "An exmple of numerical instability with Wilkinson's polynomial"
 author: "JMA"
 date: "September 1, 2017"
 output: html_document
@@ -9,7 +9,10 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## An exmple of numerical instability with Wilkinson's polynomial
+### Wilkinson's polynomial, a numerical computation horror story
+
+With Halloween just around the corner, it's the season to raise the 
+the horrors that occur when the
 
 
 Evaluate the Wilkinson polynomial by term by term construction -
@@ -44,7 +47,7 @@ wilkinson.20 <- function(x) {
 }
 ```
 
-Google's _Protocol Buffers_ convert language-specific data structures to a universal binary transfer format. It has interfaces in several languages, but not `R`. Fortunately `RProtoBuf` wraps _Protocol Buffers_, and goes a step further, to generate protocol payload conversion descriptions (as contained in `.proto` file) dynamically, hiding the machinery needed with other languages. 
+Google's _Protocol Buffers_ convert language-specific data structures to a universal binary transfer format. It comes with interfaces in several languages, but not `R`. Fortunately on CRAN there is a package `RProtoBuf` wraps _Protocol Buffers_, and goes a step further, to generate protocol payload conversion descriptions dynamically (that take the place of writing a `.proto` definition file), hiding some of the machinery needed with other languages. 
 
 ```{r}
 if (!("RProtoBuf"  %in% .packages(all=TRUE)) ) {
