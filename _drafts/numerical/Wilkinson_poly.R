@@ -59,38 +59,23 @@ if (plot.it) {
 }
 
 
-
-
-# Build a polynomial by multiplying a new (x - b) term
-# poly.coefs [1 a_1 ... a_n]
-# new.term    b
-# product    [1 a_1*b a_2 + a_1*b ... a_n*b]
-add.poly.term.int <- function(poly.coefs, new.term) {
-  c(poly.coefs, 0L) + c(0L, -as.integer(new.term) * poly.coefs )   # once integer overflow occurs, returns NA.
-}
-
-# Same but dont restrict coefs to ints.  Rounding will occur
-add.poly.term <- function(poly.coefs, new.term) {
-  c(poly.coefs, 0L) + c(0L, -new.term * poly.coefs )   # once integer overflow occurs, returns NA.
-}
-
-
-prod.of.terms.aux <- function(coefs, root.l) {
-  #cat(root.l[1], ',', length(root.l),' : ',coefs, '\n')
-  if ( length(root.l) == 1) {
-    return( coefs )
-  } else {
-    return(prod.of.terms.aux(add.poly.term(coefs, root.l[1]), root.l[-1]))
-  }
-}
-
 ###############################################################################################
 # prod.of.terms
 ###############################################################################################
 #
-# n - number of terms of the form (x - k), k = 1..n to multiply
+#An alternate way to generate Wilkinson's polynomial by explictly building the coefficients for each term.
+# n - number of terms to generate. k = 1..n to multiply
 prod.of.terms <- function(n){
   prod.of.terms.aux(c(1L, -1L), 1+ seq(1, n))
+}
+
+prod.of.terms.aux <- function(coefs, root.l) {
+    #cat(root.l[1], ',', length(root.l),' : ',coefs, '\n')
+    if ( length(root.l) == 1) {
+        return( coefs )
+    } else {
+        return(prod.of.terms.aux(add.poly.term(coefs, root.l[1]), root.l[-1]))
+    }
 }
 
 #a vector of powers of x, computed recursively
@@ -101,6 +86,19 @@ powers.of.x <- function(x, n) {
         return(c(x * powers.of.x(x, n-1), 1))
 }
 
+# Build a polynomial by multiplying a new (x - b) term
+# poly.coefs [1 a_1 ... a_n]
+# new.term    b
+# product
+#    [1 a_1*b a_2 + a_1*b ... a_n*b]
+add.poly.term.int <- function(poly.coefs, new.term) {
+    c(poly.coefs, 0L) + c(0L, -as.integer(new.term) * poly.coefs )   # once integer overflow occurs, returns NA.
+}
+
+# Same but dont restrict coefs to ints.  Rounding will occur
+add.poly.term <- function(poly.coefs, new.term) {
+    c(poly.coefs, 0L) + c(0L, -new.term * poly.coefs )   # once integer overflow occurs, returns NA.
+}
 
 ###############################################################################################
 # evaluate the Wilkinson Polynomial
