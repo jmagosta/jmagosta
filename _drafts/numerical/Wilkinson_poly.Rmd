@@ -1,5 +1,5 @@
 ---
-title: "An example of numerical instability with Wilkinson's polynomial"
+title: "Numerical instability, and what to do about it, as seen with Wilkinson's polynomial"
 author: "JMA"
 date: "September 1, 2017"
 output: html_document
@@ -11,7 +11,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 The Wilkinson polynomial is a a computer scientist's computational nightmare; an object lesson in how badly wrong things can
 go due to the effects of finite numerical accuracy.  In this blog we'll show just how bad this can be. We can use this as a 
-sensitive test for different numerical encodings (e.g. IEEE 785?), as we will demonstrate with encodings for web transport. 
+sensitive test for different numerical encodings (e.g. IEEE 754), as we will demonstrate with encodings for web transport. 
 
 
 ### A Wilkinson polynomial of degree 20
@@ -117,10 +117,13 @@ powers.of.x <- function(x, n) {
 
 
 As the polynomial degree increases there are fewer values where it evaluates correctly to zero, until for degree 20, no values are 
-correct. 
+correct. They all should be equal to zero. 
 ```{r}
-for (z in 12:19 )
-    print(sapply(1:z, function(x) evaluate.wilkinson(x, 1+z)))
+for (z in 12:19 ) {
+    cat(z, ': ', sapply(1:z, function(x) evaluate.wilkinson(x, 1+z)), '\n')
+    cat('\n')
+}
+    
 ```
 
 What happens for the same, but send the coefficients on a `json` round-trip. We should see the same values, but we see once the rounding errors occur, the `json` conversion exacerbates things. 
@@ -133,7 +136,7 @@ evaluate.wilkinson.json  <- function(x, n) {
 }
 
 for (z in 12:19 )
-    print(sapply(1:z, function(x) evaluate.wilkinson.json(x, 1+z)))
+    cat(format(sapply(1:z, function(x) evaluate.wilkinson.json(x, 1+z)), width = 15), '\n\n')
 ```
 
 
@@ -204,7 +207,9 @@ wilkinson.errs.pb <- function(the.range= 1:10, poly.degree=17) {
 }
 ```
 
-plot the errors in errors in the "round trip" evaluation for `json` and protocol buffers.
+When we plot the "round trip" errors for `json` and protocol buffers, we see that unlike with `json`, the protocol buffer 
+transformations preserve the values before and after encoding steps.  
+
 ```{r errors, echo=FALSE}
 the.json.errs <- wilkinson.errs.json(1:20, 20)
 plot(the.json.errs[[1]], the.json.errs[[2]], type='b', col='red', main='Round Trip Evaluation Errors')
@@ -212,3 +217,26 @@ the.pb.errs <- wilkinson.errs.pb(1:20, 20)
 plot(the.pb.errs[[1]], the.pb.errs[[2]], type='b', col='red')
 ```
 
+So at the end of the day the limits are imposed by `R`'s own numerical limitations, as the Wilkinson polynomial demonstrates. `R`'s numerics are an implementation of the widely adopted IEEE 754 standard. The precision of an `R` double on an IEEE 754-compliant platform (e.g. an x86) is not quite 16 decimal digits, For details see [Numerical Characteristics of the Machine](https://www.rdocumentation.org/packages/base/versions/3.4.1/topics/.Machine) in the R documentation. Here, for example are how 
+to find the smallest real and largest integer values. 
+```{r}
+.Machine$double.eps
+.Machine$integer.max
+# which is just equal to
+2^31 - 1
+```
+
+
+
+#### Loss-free data serialization frameworks
+
+_Protocol buffers_ aren't the only way to transfer data losslessly.  It is a common need with remote function calls, and
+comes up with cross-platform services such as _Restful HTTP_.  They all share a commmon model, of starting with an _interface
+definition file_ either manually or dynamically generated, then supporting compilers in a variey of languages to read
+and write contents according to that definition. 
+
+[Thrift](https://thrift.apache.org/) is a full featured protocol, created by Facebook, and now part of Apache. An 
+alternative is the slightly more economical [Apache Avro](http://avro.apache.org/docs/current/).  Microsoft has its own very rich offering with [Bond](https://github.com/Microsoft/bond/).
+Sadly only _protocol buffers_ has an `R` version. 
+As for `json` based serialization, as an easy and efficient alternative, since `json` uses  a text
+conversion rather than binary encoding, it suffers losses with numeric data, as we've demonstrated. 
