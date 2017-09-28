@@ -1,5 +1,5 @@
 ---
-title: "An exmple of numerical instability with Wilkinson's polynomial"
+title: "Numerical instability, and what to do about it, as seen with Wilkinson's polynomial"
 author: "JMA"
 date: "September 1, 2017"
 output: html_document
@@ -9,15 +9,18 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-### Wilkinson's polynomial, a numerical computation horror story
+The Wilkinson polynomial is a a computer scientist's computational nightmare; an object lesson in how badly wrong things can
+go due to the effects of finite numerical accuracy.  In this blog we'll show just how bad this can be. We can use this as a 
+sensitive test for different numerical encodings (e.g. IEEE 754), as we will demonstrate with encodings for web transport. 
 
-With Halloween just around the corner, it's the season to raise the 
-the horrors that occur when the
 
-Wilkinson polynomial has integer roots from 1 to $n$. Evaluate the polynomial by term by term construction
+### A Wilkinson polynomial of degree 20
+
+The Wilkinson polynomial has the nice property that we know its values over a subset of the natural numbers.  To be precise,
+by construction it has integer roots from 1 to $n$, so for $w_n(x) = 0\ \mbox{for}\ x = 1 \ldots n$.  The best way to  evaluate the polynomial this function is to compute this expression
 $w_n(x) = \prod_{k=1\ldots n}(x-k)$
 
-This avoids integer rounding errors -  a smoother version
+This is convenient because each term in the product is a small number, of the order of the degree of the polynomial.  
 
 ```{r wilkinson.products}
 
@@ -30,9 +33,9 @@ sapply(x, w)
 }
 ```
 
-Expanding the polynomial, one finds
+Alternatively writing the terms explicitly for this polynomial reveals the problem; it consists of huge terms of alternating signs. 
 
-```{r wilkinson.20}
+```{r wilkinson.20, echo=FALSE}
 wilkinson.20 <- function(x) {
     y <- x^20 - 210L * x^19 + 20615L * x^18 - 1256850L * x^17 + 53327946L * x^16 -
     1672280820L * x^15 +40171771630L * x^14 - 756111184500L * x^13 +
@@ -46,11 +49,99 @@ wilkinson.20 <- function(x) {
     y
 }
 ```
-Note that just evaluating it in this form suffers from a few percent noise due to integer overflow.
+Note that just creating this function will return errors stating that the integer expressions cannot be converted into integer values,
+since the values are too large. And the errors evaluating the polynomial's values are similarly are large.  This is not just a question of a rounding errors that product a bad approximation. The function is unstable and errors are unbounded. 
 
-(Insert W. examples)
+### Generating Wilkinson polynomial coefficients
 
-##### Transfering binary payloads, a better way to travel
+To look into this further, here are functions that generate the coefficients for any degree Wilkinson polynomial
+ explicitly building the coefficients for each term.
+
+ k = 1..n to multiply
+```{r prod.of.terms}
+prod.of.terms <- function(n){
+  # n - number of terms to generate.
+  prod.of.terms.aux(c(1L, -1L), 1+ seq(1, n))
+}
+
+prod.of.terms.aux <- function(coefs, root.l) {
+    # coefs  - the partial coefficient results
+    # root.l - list of the multipliers to the coefficients.  Recur on this. 
+    if ( length(root.l) == 1) {
+        return( coefs )
+    } else {
+        return(prod.of.terms.aux(add.poly.term(coefs, root.l[1]), root.l[-1]))
+    }
+}
+
+# Build a polynomial by multiplying a new (x - b) term
+# poly.coefs [1 a_1 ... a_n]
+# new.term    b
+# product
+#    [1 a_1*b a_2 + a_1*b ... a_n*b]
+add.poly.term.int <- function(poly.coefs, new.term) {
+    c(poly.coefs, 0L) + c(0L, -as.integer(new.term) * poly.coefs )   # once integer overflow occurs, returns NA.
+}
+
+# Same but dont restrict coefs to ints.  Rounding will occur
+add.poly.term <- function(poly.coefs, new.term) {
+    c(poly.coefs, 0L) + c(0L, -new.term * poly.coefs )   # once integer overflow occurs, returns NA.
+}
+```
+
+For example we generate the coefficients for the polynomial of degree 20, to compare with the example above. 
+```{r}
+prod.of.terms(20)
+```
+
+
+
+#### Evaluate the Wilkinson Polynomial
+
+```{r}
+# Use the computed coefficients and evaluate the polynomial
+# eps - bias in coefficients.
+evaluate.wilkinson  <- function(x, n) {
+    individual.terms <- prod.of.terms(n) * powers.of.x(x, n)
+    sum(individual.terms)
+}
+#a vector of powers of x, computed recursively
+powers.of.x <- function(x, n) {
+    if (n == 0)
+        return(1)  # the zeroth power of x
+    else
+        return(c(x * powers.of.x(x, n-1), 1))
+}
+
+```
+
+
+As the polynomial degree increases there are fewer values where it evaluates correctly to zero, until for degree 20, no values are 
+correct. They all should be equal to zero. 
+```{r}
+for (z in 12:19 ) {
+    cat(z, ': ', sapply(1:z, function(x) evaluate.wilkinson(x, 1+z)), '\n')
+    cat('\n')
+}
+    
+```
+
+What happens for the same, but send the coefficients on a `json` round-trip. We should see the same values, but we see once the rounding errors occur, the `json` conversion exacerbates things. 
+
+```{r}
+library(jsonlite)
+evaluate.wilkinson.json  <- function(x, n) {
+    coefs <- fromJSON(toJSON( prod.of.terms(n))) * powers.of.x(x, n)
+    sum(coefs)
+}
+
+for (z in 12:19 )
+    cat(format(sapply(1:z, function(x) evaluate.wilkinson.json(x, 1+z)), width = 15), '\n\n')
+```
+
+
+
+#### Transfering binary payloads, a better way to travel
 
 Google's _Protocol Buffers_ convert language-specific data structures
 to a universal binary transfer format. It has interfaces in several
@@ -87,6 +178,10 @@ something like this:
 protoc --version
 ```
 
+If instead the command isn't recognized, you need to install the `c++` version of [_Protocol Buffers_](https://developers.google.com/protocol-buffers/) from [its github repository](https://github.com/google/protobuf.git). Be forewarned that you may discover that this takes more than just a few steps since it requires an extensive tool-chain. Follow 
+the `README.md` file in the `src` directory, which has you run the `./autogen.sh` file in the root directory, then run `./configure`.
+
+
 If instead the command isn't recognized, you need to install the `c++`
 version of [_Protocol
 Buffers_](https://developers.google.com/protocol-buffers/) from [its
@@ -114,3 +209,63 @@ everything needed.  Does this remind you of the story _[If you give a
 Mouse a Cookie?](https://en.wikipedia.org/wiki/If_You_Give_a_Mouse_a_Cookie)_
 You get the picture. :)
  
+### How well does the protocol buffer do with numerical errors
+
+
+Same, but send the coefficients on a protocol buffer round-trip
+```{r}
+evaluate.wilkinson.buffers  <- function(x, n) {
+  coefs <- unserialize_pb(serialize_pb( prod.of.terms(n), NULL)) * powers.of.x(x, n)
+  sum(coefs)
+}
+```
+
+#### compare the json serialized roots with the internal values
+```{r}
+wilkinson.errs.json <- function(the.range= 1:10, poly.degree=17) {
+  errs <- abs(sapply(the.range, function(x)evaluate.wilkinson(x,poly.degree)) -
+                sapply(the.range, function(x)evaluate.wilkinson.json(x,poly.degree)))
+  list(the.range, errs)
+}
+
+# compare the protocol buffer serialized roots with the internal values
+wilkinson.errs.pb <- function(the.range= 1:10, poly.degree=17) {
+  errs <- abs(sapply(the.range, function(x)evaluate.wilkinson(x,poly.degree)) -
+                sapply(the.range, function(x)evaluate.wilkinson.buffers(x,poly.degree)))
+  list(the.range, errs)
+}
+```
+
+When we plot the "round trip" errors for `json` and protocol buffers, we see that unlike with `json`, the protocol buffer 
+transformations preserve the values before and after encoding steps.  
+
+```{r errors, echo=FALSE}
+the.json.errs <- wilkinson.errs.json(1:20, 20)
+plot(the.json.errs[[1]], the.json.errs[[2]], type='b', col='red', main='Round Trip Evaluation Errors')
+the.pb.errs <- wilkinson.errs.pb(1:20, 20)
+plot(the.pb.errs[[1]], the.pb.errs[[2]], type='b', col='red')
+```
+
+So at the end of the day the limits are imposed by `R`'s own numerical limitations, as the Wilkinson polynomial demonstrates. `R`'s numerics are an implementation of the widely adopted IEEE 754 standard. The precision of an `R` double on an IEEE 754-compliant platform (e.g. an x86) is not quite 16 decimal digits, For details see [Numerical Characteristics of the Machine](https://www.rdocumentation.org/packages/base/versions/3.4.1/topics/.Machine) in the R documentation. Here, for example are how 
+to find the smallest real and largest integer values. 
+```{r}
+.Machine$double.eps
+.Machine$integer.max
+# which is just equal to
+2^31 - 1
+```
+
+
+
+#### Loss-free data serialization frameworks
+
+_Protocol buffers_ aren't the only way to transfer data losslessly.  It is a common need with remote function calls, and
+comes up with cross-platform services such as _Restful HTTP_.  They all share a commmon model, of starting with an _interface
+definition file_ either manually or dynamically generated, then supporting compilers in a variey of languages to read
+and write contents according to that definition. 
+
+[Thrift](https://thrift.apache.org/) is a full featured protocol, created by Facebook, and now part of Apache. An 
+alternative is the slightly more economical [Apache Avro](http://avro.apache.org/docs/current/).  Microsoft has its own very rich offering with [Bond](https://github.com/Microsoft/bond/).
+Sadly only _protocol buffers_ has an `R` version. 
+As for `json` based serialization, as an easy and efficient alternative, since `json` uses  a text
+conversion rather than binary encoding, it suffers losses with numeric data, as we've demonstrated. 
