@@ -12,4 +12,4 @@ github_username:  jmagosta
 markdown: kramdown
 
 
-theme: jekyll-theme-tactile
+# theme: jekyll-theme-tactile
