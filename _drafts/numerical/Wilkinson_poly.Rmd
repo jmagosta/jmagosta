@@ -143,7 +143,13 @@ for (z in 12:19 )
 
 #### Transfering binary payloads, a better way to travel
 
-Google's _Protocol Buffers_ convert language-specific data structures to a universal binary transfer format. It has interfaces in several languages, but not `R`. Fortunately `RProtoBuf` wraps _Protocol Buffers_, and goes a step further, to generate protocol payload conversion descriptions (as contained in `.proto` files) dynamically, hiding the machinery needed with other languages. 
+Google's _Protocol Buffers_ convert language-specific data structures
+to a universal binary transfer format. It has interfaces in several
+languages, but not `R`. Fortunately on CRAN there is a package
+`RProtoBuf` that wraps _Protocol Buffers_, and goes a step further, to
+generate protocol payload conversion descriptions dynamically (that
+take the place of writing a `.proto` definition file), hiding some of
+the machinery needed with other languages.
 
 ```{r}
 if (!("RProtoBuf"  %in% .packages(all=TRUE)) ) {
@@ -160,15 +166,36 @@ On the Mac you may instead get an error during install:
    checking for google/protobuf/stubs/common.h... no
    configure: WARNING: Protobuf headers not found with default CXXFLAGS and CPPFLAGS, manually trying /usr/local/include
 ```
-This fails when `pkg-config` doesn't find include files that are missing. This is because the `RProtobuf` install requires your machine already to have Google's _Protocol Buffers_ installed from which it gets these files. To find out if they are there already, see if the compiler `protoc` runs at the command line. If it works you should get something like this: 
+
+This fails when `pkg-config` doesn't find include files that are
+missing. This is because the `RProtobuf` install requires your machine
+already to have Google's _Protocol Buffers_ installed from which it
+gets these files. To find out if they are there already, see if the
+compiler `protoc` runs at the command line. If it works you should get
+something like this:
+
 ```{bash}
 protoc --version
 ```
+
 If instead the command isn't recognized, you need to install the `c++` version of [_Protocol Buffers_](https://developers.google.com/protocol-buffers/) from [its github repository](https://github.com/google/protobuf.git). Be forewarned that you may discover that this takes more than just a few steps since it requires an extensive tool-chain. Follow 
 the `README.md` file in the `src` directory, which has you run the `./autogen.sh` file in the root directory, then run `./configure`.
 
-Note: On the Mac you will need several binaries that come installed with the _command line tools_, which come with Apple's _XCode_ development environment. Moreover, the 
-configure command requires `bazel`, which you can install with `brew`, the Mac package install tool, which you can get from 
+
+If instead the command isn't recognized, you need to install the `c++`
+version of [_Protocol
+Buffers_](https://developers.google.com/protocol-buffers/) from [its
+github repository](https://github.com/google/protobuf.git). Be
+forewarned that you may discover that this takes more than just a few
+steps since it requires an extensive toolchain. Follow the `README.md`
+file in the `src` directory, which has you run the `./autogen.sh` file
+in the root directory, then run `./configure`.
+
+Note: On the Mac you will need several binaries that come installed
+with the _command line tools_, which come with Apple's _XCode_
+development environment. Moreover, the configure command requires
+`bazel`, which you can install with `brew`, the Mac package install
+tool, which you can get from
 
 >   /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
 
@@ -176,9 +203,11 @@ Of course for this you need `ruby` installed. Then you can
 
 >   brew install bazel
 
-and any other missing build tools, including glibtool (a replacement for Mac's native libtool).  Don't worry eventually you'll get 
-everything needed.
- Does this remind you of the story _[If you give a Mouse a Cookie?](https://en.wikipedia.org/wiki/If_You_Give_a_Mouse_a_Cookie)_ You get the picture. :)
+and any other missing build tools, including glibtool (a replacement
+for Mac's native libtool).  Don't worry eventually you'll get
+everything needed.  Does this remind you of the story _[If you give a
+Mouse a Cookie?](https://en.wikipedia.org/wiki/If_You_Give_a_Mouse_a_Cookie)_
+You get the picture. :)
  
 ### How well does the protocol buffer do with numerical errors
 
