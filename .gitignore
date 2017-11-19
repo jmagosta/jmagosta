@@ -4,6 +4,8 @@ _site/
 *~
 *.html
 *.xml
+*.Rproj
+.Rhistory
 
-.Rproj.user
+
 
