@@ -2,7 +2,6 @@
 .sass-cache
 _site/
 *~
-*.html
 *.xml
 *.Rproj
 .Rhistory
