@@ -16,11 +16,11 @@ layout: page
 	
 2. The inverse lookup, to find a SHA1 key from a tag, file-name?  etc.
 
-    	$ git rev-parse <name>
+		$ git rev-parse <name>
     
 3. To run the SHA1 hash on content
 
-    	$ git hash-object <file-name>
+		$ git hash-object <file-name>
 	
 4. To see the correspondence in the index between files and their keys.
 
@@ -38,7 +38,7 @@ Day-to-day commands are composed of lower-level commands such as these that are 
 	
 3. Human readable git objects:
 
-    	$ git show <some-object>
+		$ git show <some-object>
     
 *****
 
@@ -46,13 +46,19 @@ Day-to-day commands are composed of lower-level commands such as these that are 
 
 1. The inverse of `git add`, to unstage a file (remove it from the index) without reverting to the previous committed version:
 
-    	$ git rm --cached <file-name>
+		$ git rm --cached <file-name>
     
-In general the `--cached` switch applies the command to the index.
+In general the `--cached` switch applies the command to the index. Along these lines, 
+[this](http://blog.jonathanchannon.com/2012/11/18/gitignore-not-working-fixed/) shows how to restore `.gitignore` to its proper function
+
+		$ git rm -r --cached .
+		$ git add .
+		$ git commit -m"fixed gitignore"
+
 
 2. To see the sequence in the log on a file that has been moved or renamed:
 
-    	$ git log --follow <file-name>
+		$ git log --follow <file-name>
     
     
     

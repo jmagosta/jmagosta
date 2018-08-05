@@ -1,0 +1,8 @@
+// polynomial.proto
+// Protocol descriptor for Wilkinson polynomial coefficients
+//                         made of signed 64 bit integers
+// JMA 29 Aug 2017
+////////////////////////////
+message Polynomial {
+  repeated sint64 coefs = 1 [packed=true];
+}

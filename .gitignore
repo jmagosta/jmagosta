@@ -1,5 +1,10 @@
 .DS_Store
 .sass-cache
-_site/*
+_site/
 *~
-.DS_Store
+*.xml
+*.Rproj
+.Rhistory
+
+
+
