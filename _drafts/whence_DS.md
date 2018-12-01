@@ -40,6 +40,10 @@ techniques as an emerging trend of a new science.
 
 In this early reference to _Big Data_, the authors explain that the title refers back to a historic paper "The unreasonable effectiveness of mathematics". 
 
+M Jordan, D K L Lin (2014) Statistics for Big Data: Are Statisticians ready for Big Data?"
+ICSA Bulletin Jan 2014.
+
+
 ### History of Learning from Data
 
 > David Donoho
